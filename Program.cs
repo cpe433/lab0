@@ -43,15 +43,18 @@ public partial class Crawler
     public async Task GetPage(String url, int level)
     {
         // Your code here
+        // Note: you need this step for recursive operation
+        //base case
         if(level <= 0)
         {
             return;
         }
-        // Note: you need this step for recursive operation
+
         if (basedFolder == null)
         {
             throw new Exception("Please set the value of base folder using SetBasedFolder method first.");
         }
+
         if (String.IsNullOrEmpty(url))
         {
             throw new ArgumentNullException(nameof(url));
@@ -134,12 +137,17 @@ class Program
     static void Main(string[] args)
     {
         Crawler cw = new();
-        // Can you improve this code?
-        cw.SetBasedFolder(args.Length > 0 ? args[0] : ".");
-        cw.SetMaxLinksPerPage(args.Length > 1 ? int.Parse(args[1]) : 5);
-        cw.GetPage(args.Length > 2 ? args[2] : "https://dandadan.net/" , args.Length > 3 ? int.Parse(args[3]) : 2).Wait();
-
-        //args[0] = based folder
+        //try catch for invalid input
+        try{
+            cw.SetBasedFolder(args.Length > 0 ? args[0] : ".");
+            cw.SetMaxLinksPerPage(args.Length > 1 ? int.Parse(args[1]) : 5);
+            cw.GetPage(args.Length > 2 ? args[2] : "https://dandadan.net/" , args.Length > 3 ? int.Parse(args[3]) : 2).Wait();
+        }catch(Exception e){
+            Console.WriteLine("Invalid input");
+            Console.WriteLine("Example usage: dotnet run <based folder (exist folder)> <max links per page> <url> <level>");
+            Console.WriteLine("Example: dotnet run . 5 https://dandadan.net/ 2");
+        }
+        //args[0] = based folder (exist folder)
         //args[1] = max links per page
         //args[2] = url
         //args[3] = level
