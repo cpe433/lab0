@@ -135,7 +135,6 @@ class Program
     {
         Crawler cw = new();
         // Can you improve this code?
-        //loop through the args and set the based folder and max links per page
         cw.SetBasedFolder(args.Length > 0 ? args[0] : ".");
         cw.SetMaxLinksPerPage(args.Length > 1 ? int.Parse(args[1]) : 5);
         cw.GetPage(args.Length > 2 ? args[2] : "https://dandadan.net/" , args.Length > 3 ? int.Parse(args[3]) : 2).Wait();
