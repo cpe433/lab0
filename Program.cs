@@ -44,6 +44,9 @@ public partial class Crawler
     {
         // Your code here
         // Note: you need this step for recursive operation
+        if (level <= 0){
+            return; // Base case for recursion
+        }
         if (basedFolder == null)
         {
             throw new Exception("Please set the value of base folder using SetBasedFolder method first.");
@@ -78,6 +81,7 @@ public partial class Crawler
                     {
                         // Your code here
                         // Note: It should be recursive operation here
+                        await GetPage(link, level - 1);
 
                         // limit number of links in the page, otherwise it will load lots of data
                         if (++count >= maxLinksPerPage) break;
