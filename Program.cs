@@ -9,8 +9,20 @@ namespace simple_crawler;
 public partial class Crawler
 {
     
-    protected String? basedFolder = null;
-    protected int maxLinksPerPage = 3;
+    protected String? basedFolder;
+    protected int maxLinksPerPage;
+
+    public Crawler()
+    {
+        basedFolder = null;
+        maxLinksPerPage = 3;
+    }
+
+    public Crawler(String folder, int maxLinksPerPage)
+    {
+        this.basedFolder = folder;
+        this.maxLinksPerPage = maxLinksPerPage;
+    }
 
     /// <summary>
     /// Method <c>SetBasedFolder</c> sets based folder to store retrieved contents.
@@ -132,10 +144,10 @@ class Program
 {
     static void Main(string[] args)
     {
-        Crawler cw = new();
         // Can you improve this code?
-        cw.SetBasedFolder(".");
-        cw.SetMaxLinksPerPage(5);
+        Crawler cw = new(".", 5);
+        // cw.SetBasedFolder(".");
+        // cw.SetMaxLinksPerPage(5);
         cw.GetPage("https://dandadan.net/", 2).Wait();
     }
 }
