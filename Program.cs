@@ -8,9 +8,9 @@ namespace simple_crawler;
 /// </summary>
 public partial class Crawler
 {
-    
     protected String? basedFolder = null;
     protected int maxLinksPerPage = 3;
+    protected HashSet<string> visitedLinks = new();
 
     /// <summary>
     /// Method <c>SetBasedFolder</c> sets based folder to store retrieved contents.
@@ -53,6 +53,14 @@ public partial class Crawler
             throw new ArgumentNullException(nameof(url));
         }
 
+        // Ensure that we don't revisit links
+        if (visitedLinks.Contains(url) || level <= 0)
+        {
+            return;
+        }
+
+        visitedLinks.Add(url);
+
         // For simplicity, we will use <c>HttpClient</c> here, but if you want you can try <c>TcpClient</c>
         HttpClient client = new();
 
@@ -74,13 +82,16 @@ public partial class Crawler
                 foreach (String link in links)
                 {
                     // We only interested in http/https link
-                    if(link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
+                    if (link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
                     {
                         // Your code here
                         // Note: It should be recursive operation here
 
                         // limit number of links in the page, otherwise it will load lots of data
                         if (++count >= maxLinksPerPage) break;
+
+                        // Recursive call for each link
+                        await GetPage(link, level - 1);
                     }
                 }
             }
@@ -108,7 +119,7 @@ public partial class Crawler
     {
         Regex regexLink = MyRegex();
 
-        HashSet<string> newLinks = [];
+        HashSet<string> newLinks = new();
         // We apply regular expression to find matches
         foreach (var match in regexLink.Matches(content))
         {
@@ -122,16 +133,23 @@ public partial class Crawler
         }
         return newLinks;
     }
-
 }
+
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        Crawler cw = new();
-        // Can you improve this code?
-        cw.SetBasedFolder(".");
-        cw.SetMaxLinksPerPage(5);
-        cw.GetPage("https://dandadan.net/", 2).Wait();
+        try
+        {
+            Crawler cw = new();
+            // Can you improve this code?
+            cw.SetBasedFolder(".");
+            cw.SetMaxLinksPerPage(5);
+            await cw.GetPage("https://dandadan.net/", 2); // Start crawling from the provided URL with level 2
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
