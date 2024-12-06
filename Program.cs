@@ -9,8 +9,20 @@ namespace simple_crawler;
 public partial class Crawler
 {
     
-    protected String? basedFolder = null;
-    protected int maxLinksPerPage = 3;
+    protected String? basedFolder;
+    protected int maxLinksPerPage;
+
+    public Crawler()
+    {
+        basedFolder = null;
+        maxLinksPerPage = 3;
+    }
+
+    public Crawler(String folder, int maxLinksPerPage)
+    {
+        this.basedFolder = folder;
+        this.maxLinksPerPage = maxLinksPerPage;
+    }
 
     /// <summary>
     /// Method <c>SetBasedFolder</c> sets based folder to store retrieved contents.
@@ -44,6 +56,9 @@ public partial class Crawler
     {
         // Your code here
         // Note: you need this step for recursive operation
+        if (level <= 0){
+            return; // Base case for recursion
+        }
         if (basedFolder == null)
         {
             throw new Exception("Please set the value of base folder using SetBasedFolder method first.");
@@ -78,6 +93,7 @@ public partial class Crawler
                     {
                         // Your code here
                         // Note: It should be recursive operation here
+                        await GetPage(link, level - 1);
 
                         // limit number of links in the page, otherwise it will load lots of data
                         if (++count >= maxLinksPerPage) break;
@@ -128,10 +144,10 @@ class Program
 {
     static void Main(string[] args)
     {
-        Crawler cw = new();
         // Can you improve this code?
-        cw.SetBasedFolder(".");
-        cw.SetMaxLinksPerPage(5);
+        Crawler cw = new(".", 5);
+        // cw.SetBasedFolder(".");
+        // cw.SetMaxLinksPerPage(5);
         cw.GetPage("https://dandadan.net/", 2).Wait();
     }
 }
