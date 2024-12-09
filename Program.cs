@@ -131,12 +131,14 @@ public partial class Crawler
 }
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
+    // Change void to async Task to use await
     {
         Crawler cw = new();
         // Can you improve this code?
         cw.SetBasedFolder(".");
         cw.SetMaxLinksPerPage(5);
-        cw.GetPage("https://dandadan.net/", 2).Wait();
+        /* Change .wait() to await since await is non-blocking, we can use it to call multiple GetPage() at the same time */
+        await cw.GetPage("https://dandadan.net/", 2);
     }
 }
