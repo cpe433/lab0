@@ -43,6 +43,10 @@ public partial class Crawler
     public async Task GetPage(String url, int level)
     {
         // Your code here
+        // Add base case for recursive operation
+        if (level <= 0){
+            return;
+        }
         // Note: you need this step for recursive operation
         if (basedFolder == null)
         {
@@ -77,6 +81,7 @@ public partial class Crawler
                     if(link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
                     {
                         // Your code here
+                        await GetPage(link, level - 1);
                         // Note: It should be recursive operation here
 
                         // limit number of links in the page, otherwise it will load lots of data
