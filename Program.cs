@@ -8,7 +8,7 @@ namespace simple_crawler;
 /// </summary>
 public partial class Crawler
 {
-    
+
     protected String? basedFolder = null;
     protected int maxLinksPerPage = 3;
 
@@ -44,6 +44,11 @@ public partial class Crawler
     {
         // Your code here
         // Note: you need this step for recursive operation
+        if (level <= 0)
+        {
+            return;
+        }
+
         if (basedFolder == null)
         {
             throw new Exception("Please set the value of base folder using SetBasedFolder method first.");
@@ -74,10 +79,11 @@ public partial class Crawler
                 foreach (String link in links)
                 {
                     // We only interested in http/https link
-                    if(link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
+                    if (link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
                     {
                         // Your code here
                         // Note: It should be recursive operation here
+                        await GetPage(link, level - 1);
 
                         // limit number of links in the page, otherwise it will load lots of data
                         if (++count >= maxLinksPerPage) break;
@@ -126,12 +132,12 @@ public partial class Crawler
 }
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         Crawler cw = new();
         // Can you improve this code?
-        cw.SetBasedFolder(".");
+        cw.SetBasedFolder(Path.GetTempPath());
         cw.SetMaxLinksPerPage(5);
-        cw.GetPage("https://dandadan.net/", 2).Wait();
+        await cw.GetPage("https://dandadan.net/", 2);
     }
 }
