@@ -43,6 +43,10 @@ public partial class Crawler
     public async Task GetPage(String url, int level)
     {
         // Your code here
+        // Add base case for recursive operation
+        if (level <= 0){
+            return;
+        }
         // Note: you need this step for recursive operation
         if (basedFolder == null)
         {
@@ -77,6 +81,7 @@ public partial class Crawler
                     if(link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
                     {
                         // Your code here
+                        await GetPage(link, level - 1);
                         // Note: It should be recursive operation here
 
                         // limit number of links in the page, otherwise it will load lots of data
@@ -126,12 +131,14 @@ public partial class Crawler
 }
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
+    // Change void to async Task to use await
     {
         Crawler cw = new();
         // Can you improve this code?
         cw.SetBasedFolder(".");
         cw.SetMaxLinksPerPage(5);
-        cw.GetPage("https://dandadan.net/", 2).Wait();
+        /* Change .wait() to await since await is non-blocking, we can use it to call multiple GetPage() at the same time */
+        await cw.GetPage("https://dandadan.net/", 2);
     }
 }
