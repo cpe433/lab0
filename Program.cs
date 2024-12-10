@@ -52,6 +52,11 @@ public partial class Crawler
         {
             throw new ArgumentNullException(nameof(url));
         }
+        if (level <= 0)
+        {
+            // stop recursion when level reaches 0
+            return;
+        }
 
         // For simplicity, we will use <c>HttpClient</c> here, but if you want you can try <c>TcpClient</c>
         HttpClient client = new();
@@ -76,8 +81,8 @@ public partial class Crawler
                     // We only interested in http/https link
                     if(link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        // Your code here
-                        // Note: It should be recursive operation here
+                        // Recursive call 
+                        await GetPage(link, level - 1);
 
                         // limit number of links in the page, otherwise it will load lots of data
                         if (++count >= maxLinksPerPage) break;
