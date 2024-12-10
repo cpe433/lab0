@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿//660615025
+using System.Text.RegularExpressions;
+
 
 namespace simple_crawler;
 
@@ -8,7 +10,7 @@ namespace simple_crawler;
 /// </summary>
 public partial class Crawler
 {
-    
+
     protected String? basedFolder = null;
     protected int maxLinksPerPage = 3;
 
@@ -52,6 +54,11 @@ public partial class Crawler
         {
             throw new ArgumentNullException(nameof(url));
         }
+        if (level <= 0)
+        {
+            // stop recursion when level is <= 0
+            return;
+        }
 
         // For simplicity, we will use <c>HttpClient</c> here, but if you want you can try <c>TcpClient</c>
         HttpClient client = new();
@@ -74,10 +81,12 @@ public partial class Crawler
                 foreach (String link in links)
                 {
                     // We only interested in http/https link
-                    if(link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
+                    if (link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        // Your code here
-                        // Note: It should be recursive operation here
+                        Console.WriteLine($"Processing link: {link} (Level: {level - 1})");
+
+                        // Recursive call for each valid link
+                        await GetPage(link, level - 1);
 
                         // limit number of links in the page, otherwise it will load lots of data
                         if (++count >= maxLinksPerPage) break;
@@ -129,9 +138,30 @@ class Program
     static void Main(string[] args)
     {
         Crawler cw = new();
-        // Can you improve this code?
-        cw.SetBasedFolder(".");
-        cw.SetMaxLinksPerPage(5);
-        cw.GetPage("https://dandadan.net/", 2).Wait();
+
+        try
+        {
+            // Validate and parse command-line arguments
+            string basedFolder = args.Length > 0 ? args[0] : ".";
+            int maxLinksPerPage = args.Length > 1 ? int.Parse(args[1]) : 5;
+            string url = args.Length > 2 ? args[2] : throw new ArgumentException("URL is required as the third argument.");
+            int level = args.Length > 3 ? int.Parse(args[3]) : 2;
+
+            // Configure crawler
+            cw.SetBasedFolder(basedFolder);
+            cw.SetMaxLinksPerPage(maxLinksPerPage);
+            // Begin crawling
+            cw.GetPage(url, level).Wait();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("An error occurred: " + ex.Message);
+            Console.WriteLine("\nUsage:");
+            Console.WriteLine("dotnet run <based folder> <max links per page> <url> <level>");
+            Console.WriteLine("Example:");
+            Console.WriteLine("dotnet run . 5 https://dandadan.net/ 2");
+        }
     }
 }
+
+
