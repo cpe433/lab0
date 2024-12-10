@@ -81,8 +81,7 @@ public partial class Crawler
                     // We only interested in http/https link
                     if(link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        // Your code here
-                        // Note: It should be recursive operation here
+                        // Recursive call 
                         await GetPage(link, level - 1);
 
                         // limit number of links in the page, otherwise it will load lots of data
