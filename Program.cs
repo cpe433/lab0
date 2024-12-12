@@ -42,8 +42,11 @@ public partial class Crawler
     /// <param name="level">the number of level to recursively access to</param>
     public async Task GetPage(String url, int level)
     {
-        // Your code here
+        // TODO:Your code here
         // Note: you need this step for recursive operation
+
+        if (level == 0) return;
+
         if (basedFolder == null)
         {
             throw new Exception("Please set the value of base folder using SetBasedFolder method first.");
@@ -76,8 +79,9 @@ public partial class Crawler
                     // We only interested in http/https link
                     if(link.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        // Your code here
+                        // TODO:Your code here
                         // Note: It should be recursive operation here
+                        await GetPage(link, level -1);
 
                         // limit number of links in the page, otherwise it will load lots of data
                         if (++count >= maxLinksPerPage) break;
@@ -126,12 +130,12 @@ public partial class Crawler
 }
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         Crawler cw = new();
         // Can you improve this code?
-        cw.SetBasedFolder(".");
+        cw.SetBasedFolder("dandadan");
         cw.SetMaxLinksPerPage(5);
-        cw.GetPage("https://dandadan.net/", 2).Wait();
+        await cw.GetPage("https://dandadan.net/", 2);
     }
 }
