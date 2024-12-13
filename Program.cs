@@ -43,7 +43,12 @@ public partial class Crawler
     public async Task GetPage(String url, int level)
     {
         // Your code here
-        // Note: you need this step for recursive operation
+         if (level <= 0)
+        {
+            // stop recursion when level reaches 0
+            return;
+        }
+        
         if (basedFolder == null)
         {
             throw new Exception("Please set the value of base folder using SetBasedFolder method first.");
@@ -52,12 +57,11 @@ public partial class Crawler
         {
             throw new ArgumentNullException(nameof(url));
         }
-
+    
         // For simplicity, we will use <c>HttpClient</c> here, but if you want you can try <c>TcpClient</c>
         HttpClient client = new();
 
-        try
-        {
+        
             // Get content from url
             HttpResponseMessage response = await client.GetAsync(url);
             if (response.IsSuccessStatusCode)
@@ -79,6 +83,10 @@ public partial class Crawler
                         // Your code here
                         // Note: It should be recursive operation here
 
+                        Console.WriteLine($"Found link: {link}");
+                        await GetPage(link, level - 1); // Recursively call 
+                        
+
                         // limit number of links in the page, otherwise it will load lots of data
                         if (++count >= maxLinksPerPage) break;
                     }
@@ -86,15 +94,18 @@ public partial class Crawler
             }
             else
             {
-                Console.WriteLine("Can't load content with return status {0}", response.StatusCode);
+                 Console.WriteLine($"Can't load content with return status {response.StatusCode}");
             }
         }
         catch (HttpRequestException ex)
         {
             Console.WriteLine("\nException caught:");
-            Console.WriteLine("Message :{0}", ex.Message);
+            Console.WriteLine($"Message : {ex.Message}");
         }
     }
+
+
+
 
     // Template for regular express to extract links
     [GeneratedRegex("(?<=<a\\s*?href=(?:'|\"))[^'\"]*?(?=(?:'|\"))")]
@@ -130,8 +141,23 @@ class Program
     {
         Crawler cw = new();
         // Can you improve this code?
-        cw.SetBasedFolder(".");
-        cw.SetMaxLinksPerPage(5);
-        cw.GetPage("https://dandadan.net/", 2).Wait();
+
+        try
+        {
+            crawler.SetBasedFolder("CrawledPages");
+            crawler.SetMaxLinksPerPage(5);
+
+            string startUrl = "https://dandadan.net/";
+            int recursionLevel = 2;
+
+            Console.WriteLine($"Starting the crawl at {startUrl} with recursion depth {recursionLevel}...");
+            await crawler.GetPage(startUrl, recursionLevel);
+            Console.WriteLine("Crawling completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
     }
 }
+
