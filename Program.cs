@@ -44,6 +44,9 @@ public partial class Crawler
     {
         // Your code here
         // Note: you need this step for recursive operation
+        if(level <= 0){
+            return;
+        }
         if (basedFolder == null)
         {
             throw new Exception("Please set the value of base folder using SetBasedFolder method first.");
@@ -78,7 +81,7 @@ public partial class Crawler
                     {
                         // Your code here
                         // Note: It should be recursive operation here
-
+                        await GetPage(link, level - 1);
                         // limit number of links in the page, otherwise it will load lots of data
                         if (++count >= maxLinksPerPage) break;
                     }
@@ -133,5 +136,10 @@ class Program
         cw.SetBasedFolder(".");
         cw.SetMaxLinksPerPage(5);
         cw.GetPage("https://dandadan.net/", 2).Wait();
+
+        //loop through the args and set the based folder and max links per page
+        cw.SetBasedFolder(args.Length > 0 ? args[0] : ".");
+        cw.SetMaxLinksPerPage(args.Length > 1 ? int.Parse(args[1]) : 5);
+        cw.GetPage(args.Length > 2 ? args[2] : "https://dandadan.net/" , args.Length > 3 ? int.Parse(args[3]) : 2).Wait();
     }
 }
